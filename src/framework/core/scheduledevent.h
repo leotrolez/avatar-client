@@ -47,8 +47,10 @@ private:
     int m_cyclesExecuted;
 };
 
-struct lessScheduledEvent : std::binary_function<ScheduledEventPtr, ScheduledEventPtr&, bool> {
-    bool operator()(const ScheduledEventPtr& a, const ScheduledEventPtr& b) {
+struct lessScheduledEvent {
+    // A herança é removida e o operador de comparação é mantido.
+    // Adicionar 'const' ao operador é uma boa prática C++ moderna.
+    bool operator()(const ScheduledEventPtr& a, const ScheduledEventPtr& b) const {
         return  b->ticks() < a->ticks();
     }
 };

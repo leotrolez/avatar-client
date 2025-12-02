@@ -11,7 +11,7 @@
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, Express OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -66,9 +66,9 @@ public:
     ConnectionPtr asConnection() { return static_self_cast<Connection>(); }
 
 protected:
-    void internal_connect(asio::ip::basic_resolver<asio::ip::tcp>::iterator endpointIterator);
+    void internal_connect(asio::ip::tcp::resolver::iterator endpointIterator);
     void internal_write();
-    void onResolve(const boost::system::error_code& error, asio::ip::tcp::resolver::iterator endpointIterator);
+    void onResolve(const boost::system::error_code& error, asio::ip::tcp::resolver::results_type results);
     void onConnect(const boost::system::error_code& error);
     void onCanWrite(const boost::system::error_code& error);
     void onWrite(const boost::system::error_code& error, size_t writeSize, std::shared_ptr<asio::streambuf> outputStream);
@@ -80,9 +80,9 @@ protected:
     ErrorCallback m_errorCallback;
     RecvCallback m_recvCallback;
 
-    asio::deadline_timer m_readTimer;
-    asio::deadline_timer m_writeTimer;
-    asio::deadline_timer m_delayedWriteTimer;
+    boost::asio::steady_timer m_readTimer;
+    boost::asio::steady_timer m_writeTimer;
+    boost::asio::steady_timer m_delayedWriteTimer;
     asio::ip::tcp::resolver m_resolver;
     asio::ip::tcp::socket m_socket;
 

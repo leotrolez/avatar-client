@@ -27,6 +27,7 @@
 #include "../stdext/cast.h"
 #include "../stdext/string.h"
 #include "../const.h"
+#include <ios>
 #include <iomanip>
 
 class Color
@@ -150,8 +151,9 @@ inline std::istream& operator>>(std::istream& in, Color& color)
                 color.setAlpha((uint8)stdext::hex_to_dec(tmp.substr(6, 2)));
             else
                 color.setAlpha(255);
-        } else
-            in.seekg(-(std::istream::streampos)tmp.length()-1, ios_base::cur);
+        }
+        else
+            in.seekg(-(std::streampos)tmp.length() - 1, ios_base::cur);
     } else {
         in.unget();
         in >> tmp;
