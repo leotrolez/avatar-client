@@ -1,0 +1,9 @@
+Module
+  name: game_attributes
+  description: Manage your attributes
+  author: DK
+  website: https://www.thelastbender.com
+  sandboxed: true
+  scripts: [ attributes ]
+  @onLoad: init()
+  @onUnload: terminate()

@@ -1,0 +1,213 @@
+PassCastWindow < Window
+  text: Password Cast
+  size: 340 100
+  margin-bottom: -15
+  draggable: false
+  @onEnter: CharacterList.doLogin()
+
+  Label
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-auto-resize: true
+    text-wrap: true
+    text: Digite a senha do Cast
+
+  PasswordTextEdit
+    id: edtCastPassword
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 5
+
+EnterGameWindow < UIWindow
+  size: 480 380
+  image-source: logo
+  anchors.centerIn: parent
+
+EnterGameButton < Button
+  width: 64
+
+ServerListButton < UIButton
+  size: 17 17
+  image-source: /images/topbuttons/minimap
+  image-color: #ffffffff
+
+  $hover !disabled:
+    image-color: #ffffff99
+
+  $pressed:
+    image-color: #ffffff44
+
+  $disabled:
+    image-color: #ffffff55
+
+EnterGameWindow
+  id: enterGame
+  @onEnter: EnterGame.doLogin()
+
+
+  Label
+    id: testLogin
+    !text: tr('Test Server')
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    color: blue
+    visible: false
+
+  MenuLabel
+    id:ml
+    !text: tr('Account name')
+    anchors.left: parent.left
+    anchors.top: parent.top
+    text-auto-resize: true
+    margin: 230 0 3 50
+
+  PasswordTextEdit
+    id: accountNameTextEdit
+    anchors.left: ml.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin: 3 50 0 2
+
+  MenuLabel
+    id: mp
+    !text: tr('Password')
+    anchors.left: prev.left
+    anchors.top: prev.bottom
+    margin-top: 10
+    text-auto-resize: true
+
+  PasswordTextEdit
+    id: accountPasswordTextEdit
+    anchors.left: mp.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin: 3 50 0 0
+
+  MenuLabel
+    id: world
+    !text: tr('World')
+    anchors.left: prev.left
+    anchors.top: prev.bottom
+    margin-top: 10
+    text-auto-resize: true
+
+  ComboBox
+    id: serverCombo
+    image-border: 3
+    anchors.left: prev.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin: 3 50 0 0
+
+  MenuLabel
+    id: serverLabel
+    !text: tr('Server')
+    anchors.left: prev.left
+    anchors.top: prev.bottom
+    margin-top: 8
+    text-auto-resize: true
+    visible: false
+
+  ServerListButton
+    id: serverListButton
+    !tooltip: tr('Server list')
+    anchors.right: parent.right
+    anchors.top: serverLabel.bottom
+    margin-top: 3
+    @onClick: ServerList.show()
+
+  TextEdit
+    id: serverHostTextEdit
+    !tooltip: tr('Make sure that your client uses\nthe correct game client version')
+    anchors.left: parent.left
+    anchors.right: serverListButton.left
+    anchors.top: serverLabel.bottom
+    margin-top: 2
+    margin-right: 4
+
+  MenuLabel
+    id: clientLabel
+    !text: tr('Client Version')
+    anchors.left: parent.left
+    anchors.top: serverHostTextEdit.bottom
+    text-auto-resize: true
+    margin-right: 10
+    margin-top: 8
+    visible: false
+
+  ComboBox
+    id: clientComboBox
+    anchors.left: parent.left
+    anchors.right: parent.horizontalCenter
+    anchors.top: clientLabel.bottom
+    margin-top: 2
+    margin-right: 3
+    width: 90
+    visible: false
+
+  MenuLabel
+    id: portLabel
+    !text: tr('Port')
+    anchors.left: serverPortTextEdit.left
+    anchors.top: serverHostTextEdit.bottom
+    margin-top: 8
+    text-auto-resize: true
+    visible: false
+
+  TextEdit
+    id: serverPortTextEdit
+    text: 7171
+    anchors.right: parent.right
+    anchors.left: parent.horizontalCenter
+    anchors.top: clientComboBox.top
+    margin-left: 3
+    visible: false
+
+  CheckBox
+    id: rememberPasswordBox
+    !text: tr('Remember password')
+    !tooltip: tr('Remember account and password when starts client')
+    anchors.left: ml.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin: 30 0 0 8
+    @onCheckChange: self:getParent():getChildById('autoLoginBox'):setEnabled(self:isChecked())
+
+  CheckBox
+    id: autoLoginBox
+    enabled: false
+    !text: tr('Auto login')
+    !tooltip: tr('Open charlist automatically when starting client')
+    anchors.left: ml.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin: 2 0 0 8
+
+  EnterGameButton
+    id: ent
+    width: 87
+    !text: tr('Ok')
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin: 0 0 40 90
+    @onClick: EnterGame.doLogin()
+
+  EnterGameButton
+    id: cast
+    width: 93
+    !text: tr('Broadcasts')
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin: 0 88 40 0
+    @onClick: EnterGame.cast()
+
+  Label
+    id: serverInfoLabel
+    font: verdana-11px-rounded
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    color: green
+    text-auto-resize: true
+    visible: false

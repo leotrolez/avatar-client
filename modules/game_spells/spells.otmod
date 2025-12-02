@@ -1,0 +1,9 @@
+Module
+  name: game_spells
+  description: View and learn spells
+  author: Avatar
+  website: www.avatartibia.com
+  sandboxed: true
+  scripts: [ spells ]
+  @onLoad: init()
+  @onUnload: terminate()

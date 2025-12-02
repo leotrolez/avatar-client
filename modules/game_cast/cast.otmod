@@ -1,0 +1,8 @@
+Module
+  name: game_cast
+  description: Cast management
+  author: Flash
+  website: tibiaavatar.com
+  sandboxed: true
+  scripts: [ cast ]
+  @onLoad: init()

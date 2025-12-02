@@ -1,0 +1,9 @@
+Module
+  name: game_task
+  description: Task
+  author: B
+  website: 
+  sandboxed: true
+  scripts: [ task ]
+  @onLoad: init()
+  @onUnload: terminate()

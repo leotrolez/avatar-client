@@ -1,0 +1,98 @@
+WidgetDay < UIWidget
+  font: terminus-14px-bold
+  text-offset: 1 15
+  color: black	
+  icon-size: 15 15
+  icon-offset: 39 32
+  image-source: ui/day
+
+  $on:
+    color: red
+
+  $hover !disabled:
+    text-offset: 1 11
+
+  $pressed:
+    text-offset: 1 17
+
+
+MainWindow
+  size: 470 450
+  !text: tr('Daily Reward')
+  color: #fcc30a
+  &focusable: false
+  visible: false
+
+  UIWidget
+    id: uiDate
+    anchors.top: parent.top
+    anchors.left: lblOnline.right
+    image-source: ui/date
+    margin: 6 0 0 56
+
+  Label
+    id: lblDate
+    font: sans-bold-16px
+    anchors.top: parent.top
+    anchors.left: uiDate.right
+    margin: 23 0 0 8
+    text-auto-resize: true
+
+  UIWidget
+    id: uiTime
+    anchors.top: parent.top
+    anchors.left: parent.left
+    image-source: ui/time
+    margin: 7 0 0 50
+
+  Label
+    id: lblOnline
+    font: verdana-11px-monochrome
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin: 11 0 0 12
+    text-auto-resize: true
+    text: Tempo Online
+    color: #fcc30a
+
+  Label
+    id: lblTime
+    font: sans-bold-16px
+    anchors.top: prev.bottom
+    anchors.left: uiTime.right
+    margin: 2 0 0 14
+    text-auto-resize: true
+    text: 0h 0m 0s
+
+  Label
+    id: lblDescription
+    anchors.top: uiTime.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    color: #fcc30a
+    text: Permaneça logado por 1 hora para receber sua recompensa!
+    text-auto-resize: true
+    text-wrap: true
+    margin-top: 17
+
+  UIScrollArea
+    id: listDay
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin: 8 13 10 14
+    phantom: true
+    layout:
+      type: grid
+      cell-size: 55 48
+      cell-spacing: 3
+      flow: true
+
+  Button
+    id: btnClose
+    size: 100 24
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin: 0 0 6 0
+    !text: tr('Close')
+    @onClick: self:getParent():hide()

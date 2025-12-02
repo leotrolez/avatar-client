@@ -1,0 +1,10 @@
+Module
+  name: game_diary
+  description: Ganhe recompensas por ficar x horas online
+  author: Gengo
+  sandboxed: true
+  scripts: [ diary, date ]
+  autoload: true
+  autoload-priority: 1001
+  @onLoad: Diary.init()
+  @onUnload: Diary.terminate()

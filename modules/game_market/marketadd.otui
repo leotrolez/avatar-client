@@ -1,0 +1,64 @@
+MainWindow
+  id: marketAdd
+  size: 223 230
+  text: Adicionar oferta
+  visible: false
+
+  Label
+    id: lblItem
+    text: Nome do item:
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  TextEdit
+    id: edtItem
+    anchors.top: lblItem.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin-top: 17
+
+  Label
+    id: lblPrice
+    !text: tr('Total price:')
+    anchors.top: edtItem.top
+    anchors.left: parent.left
+    margin-top: 30
+
+  TextEdit
+    id: edtPrice
+    anchors.top: lblPrice.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin-top: 17
+
+  Label
+    id: lblCount
+    text: Quantia:
+    anchors.top: edtPrice.top
+    anchors.left: parent.left
+    margin-top: 30
+
+  TextEdit
+    id: edtCount
+    anchors.top: lblCount.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin-top: 17
+
+  Button
+    id: buttonCancel
+    text: Cancel
+    width: 90
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    @onClick: self:getParent():hide()
+
+  Button
+    id: buttonOk
+    text: Ok
+    width: 109
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    anchors.left: parent.left
+    margin-right: 5
+    @onClick: Market.addOffer()

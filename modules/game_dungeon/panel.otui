@@ -1,0 +1,91 @@
+Panel
+  UILabel
+    id: dungeonDescription
+    size: 300 26
+    fixed-size: true
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-top: 40
+    margin-right: 16
+    font: lucida-26px-rounded
+    text: Teste de Texto
+  UIWidget
+    id: rewards
+    size: 200 42
+    anchors.centerIn: parent
+    border: 1 #6B5528
+    UIWidget
+      id: value1
+      size: 34 34
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: 4
+      margin-left: 7
+      border: 1 #6B5528
+      background-color: gray
+    UIWidget
+      id: value2
+      size: 34 34
+      anchors.top: parent.top
+      anchors.left: value1.right
+      margin-top: 4
+      margin-left: 5
+      border: 1 #6B5528
+      background-color: gray
+    UIWidget
+      id: value3
+      size: 34 34
+      anchors.top: parent.top
+      anchors.left: value2.right
+      margin-top: 4
+      margin-left: 5
+      border: 1 #6B5528
+      background-color: gray
+    UIWidget
+      id: value4
+      size: 34 34
+      anchors.top: parent.top
+      anchors.left: value3.right
+      margin-top: 4
+      margin-left: 5
+      border: 1 #6B5528
+      background-color: gray
+    UIWidget
+      id: value5
+      size: 34 34
+      anchors.top: parent.top
+      anchors.left: value4.right
+      margin-top: 4
+      margin-left: 5
+      border: 1 #6B5528
+      background-color: gray
+  Button
+    id: soloButton
+    !text: tr('Iniciar Solo')
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-left: 145
+    margin-bottom: 5
+    width: 78
+    @onClick: CharacterList.doLogin()
+  Button
+    id: findButton
+    !text: tr('Buscar Grupo')
+    anchors.left: soloButton.right
+    anchors.bottom: parent.bottom
+    margin-left: 15
+    margin-bottom: 5
+    width: 88
+    @onClick: CharacterList.doLogin()
+  VerticalScrollBar
+    id: scrollBar
+    step: 50
+    pixels-scroll: true
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+
+  ScrollablePanel
+    vertical-scrollbar: scrollBar
+    anchors.fill: parent
+    margin-right: 15

@@ -1,0 +1,34 @@
+Panel
+  OptionCheckBox
+    id: autoloot
+    !text: tr('Quick Looting')
+
+  OptionCheckBox
+    id: smartWalk
+    !text: tr('Enable smart walking')
+    !tooltip: tr('Will detect when to use diagonal step based on the\nkeys you are pressing')
+
+  OptionCheckBox
+    id: classicControl
+    !text: tr('Classic control')
+
+  OptionCheckBox
+    id: displayNames
+    !text: tr('Display creature names')
+
+  OptionCheckBox
+    id: displayHealth
+    !text: tr('Display creature health bars')
+
+  OptionCheckBox
+    id: displayText
+    !text: tr('Display text messages')
+
+  Button
+    id: changeLocale
+    !text: tr('Change language')
+    @onClick: modules.client_locales.createWindow()
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    margin-top: 5
+    width: 120

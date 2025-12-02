@@ -1,0 +1,98 @@
+MissionLabel < Label
+  height: 22
+  font: verdana-11px-monochrome
+  background-color: alpha
+  text-offset: 22 3
+  focusable: true
+  color: white
+
+  CheckBox
+    id: chkMission
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin: 2 0 0 4
+    enabled: false
+
+    $disabled:
+      image-color: white
+      color: white
+      opacity: 1
+
+  $on:
+    color: #00aa00
+
+  $focus:
+    background-color: #ffffff22
+
+QuestLabel < Label
+  height: 20
+  font: verdana-11px-monochrome
+  text-offset: 4 3
+  focusable: true
+  color: #aaaaaa
+  background-color: alpha
+
+  $on:
+    color: #00aa00
+
+  $!on:
+    color: #aaaaaa
+
+  $focus:
+    background-color: #444444
+
+  $on focus:
+    color: #00ff00
+
+  $!on focus:
+    color: #ffffff
+
+QuestLogWindow < MainWindow
+  id: questLogWindow
+  !text: tr('Informations:')
+  size: 290 420
+  @onEscape: self:destroy()
+
+  UIWidget
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    phantom: true
+    image-source: avatar
+
+  ComboBox
+    id: cmbQuestList
+    width: 250
+    image-border: 4
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 5
+
+  TextList
+    id: questList
+    width: 235
+    anchors.top: prev.bottom
+    anchors.bottom: closeButton.top
+    anchors.left: prev.left
+    margin: 10 3 8 0
+    focusable: false
+    vertical-scrollbar: questListScrollBar
+    border: 1 #644f21
+    background-color: #140e0e
+
+  VerticalScrollBar
+    id: questListScrollBar
+    anchors.top: prev.top
+    anchors.bottom: prev.bottom
+    anchors.left: prev.right
+    margin-left: 2
+    step: 14
+    pixels-scroll: true
+
+  Button
+    id: closeButton
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    !text: tr('Close')
+    width: 90
+    @onClick: self:getParent():destroy()

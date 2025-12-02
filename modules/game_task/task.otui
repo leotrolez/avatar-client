@@ -1,0 +1,296 @@
+RibbonLabel < UIWidget       
+  id: ribbonLabel      
+  anchors.right: parent.right
+  anchors.top: parent.top
+  image-source: images/ribbon
+  margin-top: 5
+  margin-right: 10
+  phantom: false
+
+UnlockTaskWindow < MainWindow
+  id: delayTaskWindow
+  anchors.centerIn: parent
+  size: 400 125
+  text-offset: 0 35
+  auto-focus: first    
+  image-source: images/window  
+  @onFocusChange: modules.game_task.onMiniWindowClose()
+
+  Label                   
+    !text: tr("To unlock this Rank you need:")  
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    
+  Label                   
+    id: unlockRankLevel 
+    margin-top: 5
+    width: 100
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    
+  Label                    
+    id: unlockRankPoints   
+    margin-top: 5   
+    width: 100
+    anchors.top: prev.bottom
+    anchors.left: parent.left  
+    
+  Label                      
+    id: unlockRankRank  
+    margin-top: 5      
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    
+  Panel                    
+    id: unlockRankUnlock  
+    size: 93 38   
+    margin-top: 25                        
+    image-source: images/buttonmade  
+    image-clip: 0 86 93 38   
+    anchors.top: parent.top
+    phantom: false
+    anchors.horizontalCenter: parent.horizontalCenter 
+
+DelayTaskWindow < MainWindow
+  id: delayTaskWindow
+  anchors.centerIn: parent
+  size: 280 60
+  text-offset: 0 35
+  auto-focus: first
+  @onFocusChange: modules.game_task.onMiniWindowClose()
+
+  Label       
+    id: minutesLabel
+    text-align: center        
+    anchors.top: parent.top
+    anchors.left: parent.left   
+    anchors.right: parent.right
+
+TaskOutfit < UICreature
+  id: CreatureUI 
+  size: 32 32
+  background: alpha
+  anchors.top: parent.top  
+  anchors.left: prev.right 
+  margin-left: 4
+  
+TaskAccept < Panel     
+  size: 94 39
+  anchors.top: parent.top  
+  anchors.right: parent.right 
+  margin-top: 25  
+  margin-right: 12
+  Panel      
+    id: acceptButtonWidget         
+    size: 94 38
+    image-source: images/buttonmade    
+    image-clip: 0 48 94 38   
+    phantom: false  
+    
+TaskDoneCancel < Panel     
+  size: 94 54
+  anchors.top: parent.top  
+  anchors.right: parent.right 
+  margin-top: 19  
+  margin-right: 12     
+  
+  Panel    
+    id: doneButtonWidget
+    size: 76 24 
+    anchors.top: parent.top    
+    anchors.right: parent.right      
+    image-source: images/buttonmade   
+    image-clip: 0 0 76 24 
+    phantom: false    
+    
+  Panel       
+    id: cancelButtonWidget
+    size: 76 24 
+    margin-top: 6
+    anchors.top: prev.bottom    
+    anchors.right: parent.right      
+    image-source: images/buttonmade   
+    image-clip: 0 24 76 24 
+    phantom: false    
+
+TaskButton < Panel  
+  height: 90
+  image-source: images/selectbox
+  padding-left: 13
+  margin: 3     
+  phantom: true      
+
+  Panel
+    id: CreatureUIPanel
+    height: 32
+    anchors.top: parent.top  
+    anchors.left: parent.left    
+    margin-left: 8    
+    margin-top: 13   
+    
+    Panel     
+      anchors.top: parent.top  
+      anchors.left: parent.left 
+
+  Label
+    id: labelKill
+    width: 50
+    anchors.top: parent.top  
+    anchors.left: prev.right  
+    margin: 8        
+    margin-top: 23   
+  
+  Panel   
+    id: TaskLevel   
+    size: 159 13
+    anchors.top: CreatureUIPanel.bottom  
+    anchors.left: parent.left     
+    margin-top: 3
+    image-source: images/labelres
+    
+  Label
+    id: labelLevel
+    anchors.top: TaskLevel.top
+    anchors.left: prev.right
+    margin-left: 5 
+  
+  Panel       
+    id: TaskReward      
+    size: 63 13
+    anchors.top: TaskLevel.bottom  
+    anchors.left: parent.left     
+    margin-top: 3
+    image-source: images/labelres   
+      
+  Label
+    id: labelReward
+    anchors.right: parent.right
+    anchors.top: TaskReward.top
+    anchors.left: prev.right
+    margin-left: 5
+    margin-top: 1  
+
+RankButton < Panel         
+  size: 89 34
+  margin-left: 7    
+  text-align: left
+  text-offset: 18 0 
+  image-source: images/rbutton  
+  image-clip: 0 0 89 34   
+  phantom: false
+  
+  Panel
+    id: RankButtonLock
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-top: 7
+    margin-right: 10    
+    phantom: false
+
+TaskWindow < MainWindow
+  id: taskWindow
+  size: 500 530
+  text-offset: 0 35 
+  text-align: top
+  image-source: images/window
+  
+  Panel
+    !text: tr("Tasks")
+    image-source: images/title    
+    anchors.top: parent.top
+    anchors.left: parent.left  
+    anchors.horizontalCenter: parent.horizontalCenter   
+    margin-top: -40        
+    
+  Label
+    id: labelPoints          
+    size: 95 20
+    anchors.top: parent.top
+    anchors.right: parent.right   
+    image-source: images/rbutton
+    margin-top: -22
+    margin-right: -7   
+    image-clip: 0 34 89 34      
+    text-offset: 15 1
+  
+  Panel             
+    id: panelBanner
+    anchors.top: labelPoints.bottom     
+    anchors.left: parent.left  
+    image-source: images/banner 
+    margin-top: 20
+  
+  Panel     
+    id: PanelRanks
+    anchors.top: labelPoints.bottom       
+    anchors.left: panelBanner.right 
+    anchors.right: parent.right
+    margin-top: 23
+    height: 34
+    
+    RankButton     
+      id: RankD 
+      !text: tr("Normal")
+      text-offset: 23 0
+      anchors.top: parent.top
+      anchors.left: parent.left    
+      margin-left: 5  
+      @onClick: modules.game_task.parseRank("D")  
+      
+    RankButton         
+      id: RankC
+      !text: tr("Daily")
+      text-offset: 28 0
+      anchors.top: parent.top  
+      anchors.left: prev.right    
+      @onClick: modules.game_task.parseRank("C")  
+        
+    RankButton     
+      id: RankB    
+      !text: tr("Boss")
+      text-offset: 30 0
+      anchors.top: parent.top
+      anchors.left: prev.right    
+      @onClick: modules.game_task.parseRank("B")  
+
+  Panel    
+    id: panelPTask         
+    margin: 10
+    margin-left: 8
+    margin-right: 2            
+    anchors.top: prev.bottom
+    anchors.left: panelBanner.right  
+    anchors.right: parent.right
+    image-source: images/box          
+    phantom: false      
+          
+    TextList
+      id: panelPTaskList
+      border-color: alpha
+      background: alpha
+      anchors.top: parent.top  
+      anchors.left: parent.left      
+      anchors.right: parent.right    
+      anchors.bottom: parent.bottom   
+      margin: 4
+      margin-right: 17
+      focusable: true   
+      vertical-scrollbar: panelPTaskListScrollBar
+    
+    VerticalScrollBar
+      id: panelPTaskListScrollBar
+      anchors.top: panelPTaskList.top
+      anchors.bottom: panelPTaskList.bottom
+      anchors.left: panelPTaskList.right
+      step: 14
+      pixels-scroll: true
+    
+  Panel  
+    size: 100 37
+    image-source: images/buttonmade 
+    image-clip: 80 5 100 37        
+    anchors.top: prev.bottom      
+    anchors.right: parent.right
+    margin-top: 6        
+    phantom: false                
+    @onClick: modules.game_task.hide()

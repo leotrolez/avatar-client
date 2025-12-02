@@ -1,0 +1,69 @@
+DungeonTabBarVertical < UITabBar
+  width: 280
+  ScrollableFlatPanel
+    id: buttonsPanel
+    image-color: alpha
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: scrollBar.left
+    anchors.bottom: parent.bottom
+    vertical-scrollbar: scrollBar
+  VerticalScrollBar
+    id: scrollBar
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 14
+    pixels-scroll: true
+DungeonTabBarVerticalPanel < Panel
+DungeonTabBarVerticalButton < UIButton
+  size: 270 106
+  color: alpha
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-right: 7
+  icon-align: top
+  icon-color: #888888
+  $first:
+    anchors.top: parent.top
+  $!first:
+    anchors.top: prev.bottom
+    margin-top: 8
+  $hover !checked:
+    icon-color: #cccccc
+  $disabled:
+    icon-color: #333333
+  $checked:
+    icon-color: #ffffff
+
+MainWindow
+  id: dungeonWindow
+  !text: tr('Dungeon')
+  padding-top: 17
+  size: 784 510
+
+  UIButton
+    id: closeDungeon
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-top: 0
+    text: X
+    !tooltip: tr('Close')
+    @onClick: toggle()
+
+  DungeonTabBarVertical
+    id: dungeonTabBar
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-top: 25
+
+  Panel
+    id: dungeonTabContent
+    size: 456 272
+    anchors.top: dungeonTabBar.top
+    anchors.left: dungeonTabBar.right
+    anchors.bottom: dungeonTabBar.bottom
+    margin-top: 0
+    margin-left: 10
+    margin-bottom: 0

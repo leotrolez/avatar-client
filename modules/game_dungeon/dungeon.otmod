@@ -1,0 +1,9 @@
+Module
+  name: game_dungeon
+  description: Dungeon panel
+  author: DK and Crypter
+  website: https://www.thelastbender.com
+  sandboxed: true
+  scripts: [ dungeon ]
+  @onLoad: init()
+  @onUnload: terminate()

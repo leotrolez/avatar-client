@@ -1,0 +1,9 @@
+Module
+  name: game_spellbar
+  description: Cast spells
+  author: Avatar
+  website: www.avatartibia.com
+  sandboxed: true
+  scripts: [ spellbar ]
+  @onLoad: init()
+  @onUnload: terminate()

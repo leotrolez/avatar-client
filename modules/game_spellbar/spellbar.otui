@@ -1,0 +1,84 @@
+SpellHorizontalBox < Panel
+  height: 36
+  layout:
+    type: horizontalBox
+    spacing: 2
+
+SpellWidget < UIWidget
+  image-source: /images/ui/menubox_locked
+  icon-size: 30 30
+  icon-offset: 3 3
+  UIProgressRect
+    id: cooldown
+    font: verdana-11px-rounded
+    color: #c3c3c388
+    size: 30 30
+    background: #303030AA
+    anchors.centerIn: parent
+    percent: 100
+    focusable: false
+    phantom: true
+  Label
+    id: hotkey
+    size: 14 14
+    font: terminus-10px
+    text-align: center
+    border-width: 1
+    border-color: #000000
+    background-color: #303030
+    color: #ffffff
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: -3
+    phantom: true
+
+CircleWidget < Panel
+  size: 38 38
+  image-source: images/weapon
+  focusable: false
+  phantom: true
+
+WeaponSkill < UIWidget
+  size: 24 24
+  margin-left: 1
+  Label
+    id: hotkey
+    font: verdana-11px-rounded
+    text-auto-resize: true
+    color: #ffffff
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    phantom: true
+
+Panel
+  id: spellBarPanel
+  image-source: images/bg
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.bottom: gameBottomPanel.top
+  WeaponSkill
+    id: weaponSkill1
+    anchors.horizontalCenter: circle1.horizontalCenter
+    anchors.verticalCenter: circle1.verticalCenter
+  WeaponSkill
+    id: weaponSkill2
+    anchors.horizontalCenter: circle2.horizontalCenter
+    anchors.verticalCenter: circle2.verticalCenter
+  CircleWidget
+    id: circle1
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-bottom: 6
+    margin-left: 45
+  CircleWidget
+    id: circle2
+    anchors.left: prev.right
+    anchors.bottom: prev.bottom
+    margin-left: 1
+  SpellHorizontalBox
+    id: spellBarBox
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-left: 8
+    margin-bottom: 6
+    margin-right: 45

@@ -1,0 +1,186 @@
+MarketRow < Panel
+  height: 48
+  background-color: alpha
+
+  Item
+    id: uiItem
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin: 8
+    virtual: true
+
+  Label
+    id: lblItem
+    anchors.left: prev.right
+    anchors.verticalCenter: prev.verticalCenter
+    margin-left: 15
+    text-auto-resize: true
+
+  Label
+    id: lblPlayer
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin: 18 0 0 205
+    text: Furia Nordestina
+    text-auto-resize: true
+
+  Label
+    id: lblQtd
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin: 18 0 0 385
+    text-auto-resize: true
+
+  Label
+    id: lblPrice
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin: 18 0 0 430
+    text-auto-resize: true
+
+  Button
+    id: btnAction
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin: 12 0 0 525
+    !text: tr('Comprar Item')
+    text-auto-resize: true
+
+  $!alternate:
+    background-color: #ffffff10
+
+
+MainWindow
+  size: 715 510
+  padding-top: 17
+  !text: tr('Market')
+  visible: false
+
+  Label
+    anchors.top: next.bottom
+    anchors.left: parent.left
+    anchors.right: btnRefresh.left
+    margin: 20 0 0 8
+    text-wrap: true
+    !text: tr('ATENÇÃO! Ao clicar duas vezes na imagem de um item, você conseguirá ver as informações do mesmo.')
+
+  UIButton
+    id: btnClose
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-top: 0
+    text: X
+    !tooltip: tr('Close')
+    @onClick: self:getParent():hide()
+
+  Button
+    id: btnRefresh
+    size: 26 26
+    anchors.top: prev.bottom
+    anchors.right: parent.right
+    !tooltip: tr('Atualizar Ofertas')
+    margin-top: 15
+    icon: ui/refresh
+    @onClick: numPage = 1 g_game.getProtocolGame():sendExtendedOpcode(mOpcode, "refresh>0")
+
+  Panel
+    id: panel
+    height: 15
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin: 10 5 0 8
+
+    Label
+      anchors.top: parent.top
+      anchors.left: parent.left
+      text: Item
+
+    Label
+      anchors.left: prev.right
+      anchors.verticalCenter: prev.verticalCenter
+      margin-left: 38
+      !text: tr('Name')
+
+    Label
+      anchors.left: prev.right
+      anchors.verticalCenter: prev.verticalCenter
+      margin-left: 100
+      !text: tr('Player')
+
+    Label
+      anchors.left: prev.right
+      anchors.verticalCenter: prev.verticalCenter
+      margin-left: 139
+      !text: tr('Qtd')
+
+    Label
+      anchors.left: prev.right
+      anchors.verticalCenter: prev.verticalCenter
+      margin-left: 30
+      !text: tr('Price')
+
+    Label
+      anchors.left: prev.right
+      anchors.verticalCenter: prev.verticalCenter
+      margin-left: 78
+      !text: tr('Buy')
+
+
+  TextList
+    id: marketList
+    height: 340
+    anchors.top: panel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    parent.bottom: btnAddOffer.top
+    margin: 5 12 0 0
+    vertical-scrollbar: scrollItems
+    border: 1 #756866
+    background-color: alpha
+
+  VerticalScrollBar
+    id: scrollItems
+    anchors.top: marketList.top
+    anchors.bottom: marketList.bottom
+    anchors.left: marketList.right
+    margin-left: 2
+    step: 50
+    pixels-scroll: true
+
+  Button
+    id: btnNext
+    size: 18 18
+    anchors.top: marketList.bottom
+    anchors.right: parent.right
+    margin: 6 14 0 0
+    !tooltip: tr('Próxima Página')
+    text: >
+    @onClick: Market.nextAndPrev(1)
+
+  Button
+    id: btnPrev
+    size: 18 18
+    anchors.top: prev.top
+    anchors.right: prev.left
+    margin-right: 5
+    !tooltip: tr('Página Anterior')
+    text: <
+    @onClick: Market.nextAndPrev(0)
+
+  Label
+    id: lblIndex
+    anchors.top: prev.top
+    anchors.right: prev.left
+    margin: 3 8 0 0
+    text-auto-resize: true
+    text: Page: 0/0
+
+  Button
+    id: btnAddOffer
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: 5
+    !text: tr('Adicionar Oferta')
+    text-auto-resize: true
+    @onClick: Market.showAddOffer()

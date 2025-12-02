@@ -1,0 +1,8 @@
+Font
+  name: eras-16px-bold
+  height: 18
+  texture: eras-16px-bold
+  glyph-size: 22 22
+  space-width: 6
+  spacing: -2 -2
+  y-offset: -2

@@ -1,0 +1,239 @@
+MainWindow
+  id: AtributosWindow
+  !text: tr('Atributos')
+  padding-top: 17
+  size: 380 250
+  @onEscape: toggle()
+
+  UIButton
+    id: CloseAtributos
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-top: 0
+    text: X
+    !tooltip: tr('Close')
+    @onClick: toggle()
+
+  Label
+    id: Label0
+    !text: tr ('Nome             Pontos       Custo')
+    font: verdana-11px-rounded
+    color: #32a3d9
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 25
+    margin-left: 40
+
+  Label
+    id: Label1
+    !text: tr ('Health')
+    !tooltip: tr('Aumenta sua quantidade de vida.')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label0.bottom
+    anchors.left: parent.left
+    margin-top: 25
+    margin-left: 40
+    icon: icons/health
+    icon-offset: -40 -5
+
+  Label
+    id: Valuehealth
+    !text: tr ('?')
+    !tooltip: tr('Aumenta sua quantidade de vida.')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label0.bottom
+    anchors.left: Label1.left
+    margin-top: 25
+    margin-left: 85
+    size: 30 20
+
+  Label
+    id: Costhealth
+    !text: tr ('?')
+    !tooltip: tr('Aumenta sua quantidade de vida.')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label0.bottom
+    anchors.left: Valuehealth.left
+    margin-top: 25
+    margin-left: 57
+    size: 30 20
+
+  Button
+    id: Addhealth
+    !text: tr ('Aprimorar')
+    !tooltip: tr('Aumenta sua quantidade de vida.')
+    font: verdana-11px-rounded
+    color: #32d968
+    size: 130 20
+    anchors.top: Label1.top
+    anchors.right: parent.right
+    margin-top: -5
+    margin-right: 5
+    @onClick: g_game.talkChannel(1, 0, "/add health, 1")
+
+  Label
+    id: Label2
+    !text: tr ('Mana')
+    !tooltip: tr('Aumenta sua quantidade de mana.')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label1.top
+    anchors.left: parent.left
+    margin-top: 35
+    margin-left: 40
+    icon: icons/mana
+    icon-offset: -35 -5
+
+  Label
+    id: Valuespeed
+    !text: tr ('?')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label1.top
+    anchors.left: Label2.left
+    margin-top: 34
+    margin-left: 85
+    size: 30 20
+
+  Label
+    id: Costspeed
+    !text: tr ('?')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label1.top
+    anchors.left: Valuespeed.left
+    margin-top: 34
+    margin-left: 57
+    size: 30 20
+
+  Button
+    id: Addspeed
+    !text: tr ('Aprimorar')
+    !tooltip: tr('Aumenta sua quantidade de mana.')
+    font: verdana-11px-rounded
+    color: #32d968
+    anchors.top: Label2.top
+    anchors.right: parent.right
+    margin-top: -5
+    margin-right: 5
+    size: 130 20
+    @onClick: g_game.talkChannel(1, 0, "/add mana, 1")
+
+  Label
+    id: Label3
+    !text: tr ('Bend Level ')
+    !tooltip: tr('Aumenta seu dano nas dobras.')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label2.top
+    anchors.left: parent.left
+    margin-top: 35
+    margin-left: 40
+    icon: icons/bend
+    icon-offset: -50 -5
+
+  Label
+    id: Valuebend
+    !text: tr ('?')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label2.top
+    anchors.left: Label3.left
+    margin-top: 34
+    margin-left: 85
+    size: 30 20
+
+  Label
+    id: Costbend
+    !text: tr ('?')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label2.top
+    anchors.left: Valuebend.left
+    margin-top: 34
+    margin-left: 57
+    size: 30 20
+
+  Button
+    id: Addbend
+    !text: tr ('Aprimorar')
+    !tooltip: tr('Aumenta seu dano nas dobras.')
+    font: verdana-11px-rounded
+    color: #32d968
+    anchors.top: Label3.top
+    anchors.right: parent.right
+    margin-top: -5
+    margin-right: 5
+    size: 130 20
+    @onClick: g_game.talkChannel(1, 0, "/add bend, 1")
+
+  Label
+    id: Label4
+    !text: tr ('Dodge')
+    !tooltip: tr('Aumenta sua velocidade de movimento e sua chance de desviar do ataque recebido.')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label3.top
+    anchors.left: parent.left
+    margin-top: 35
+    margin-left: 40
+    icon: icons/dodge
+    icon-offset: -37 -5
+
+  Label
+    id: Valuedodge
+    !text: tr ('?')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label3.top
+    anchors.left: Label4.left
+    margin-top: 34
+    margin-left: 85
+    size: 30 20
+
+  Label
+    id: Costdodge
+    !text: tr ('?')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label3.top
+    anchors.left: Valuedodge.left
+    margin-top: 34
+    margin-left: 57
+    size: 30 20
+
+  Button
+    id: Adddodge
+    !text: tr ('Aprimorar')
+    !tooltip: tr('Aumenta sua velocidade de movimento e sua chance de desviar do ataque recebido.')
+    font: verdana-11px-rounded
+    color: #32d968
+    anchors.top: Label4.top
+    anchors.right: parent.right
+    margin-top: -5
+    margin-right: 5
+    size: 130 20
+    @onClick: g_game.talkChannel(1, 0, "/add dodge, 1")
+
+  Label
+    id: Label8
+    !text: tr ('Pontos Pendentes: ')
+    font: verdana-11px-rounded
+    color: #ffe86f
+    anchors.top: Label4.top
+    anchors.left: parent.left
+    margin-top: 27
+    margin-left: 55
+
+  Label
+    id: PontosPendentes
+    !text: tr ('?')
+    font: verdana-11px-rounded
+    color: #32d968
+    anchors.top: Label8.top
+    anchors.left: Label8.right
+    margin-left: 10
+    size: 30 20
