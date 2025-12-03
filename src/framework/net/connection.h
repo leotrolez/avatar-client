@@ -11,7 +11,7 @@
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, Express OR
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -28,6 +28,9 @@
 #include <framework/core/timer.h>
 #include <framework/core/declarations.h>
 
+ // [Fix] Include boost asio here to ensure types are known
+#include <boost/asio.hpp>
+
 class Connection : public LuaObject
 {
     typedef std::function<void(const boost::system::error_code&)> ErrorCallback;
@@ -43,6 +46,10 @@ class Connection : public LuaObject
 public:
     Connection();
     ~Connection();
+
+    // [Fix] Disable copy to prevent "inaccessible" socket errors
+    Connection(const Connection&) = delete;
+    Connection& operator=(const Connection&) = delete;
 
     static void poll();
     static void terminate();
@@ -66,7 +73,8 @@ public:
     ConnectionPtr asConnection() { return static_self_cast<Connection>(); }
 
 protected:
-    void internal_connect(asio::ip::tcp::resolver::iterator endpointIterator);
+    // [Fix] Updated iterator type for modern Boost
+    void internal_connect(asio::ip::tcp::resolver::results_type::iterator endpointIterator);
     void internal_write();
     void onResolve(const boost::system::error_code& error, asio::ip::tcp::resolver::results_type results);
     void onConnect(const boost::system::error_code& error);

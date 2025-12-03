@@ -26,7 +26,8 @@
 #include "../stdext/types.h"
 #include <string>
 
-#include <boost/uuid/uuid.hpp>
+ // [Fix] Removed broken Boost UUID header
+ // #include <boost/uuid/uuid.hpp>
 
 #ifdef USE_GMP
 #include <gmp.h>
@@ -54,20 +55,23 @@ public:
     std::string sha512Encode(const std::string& decoded_string, bool upperCase);
 
     void rsaSetPublicKey(const std::string& n, const std::string& e);
-    void rsaSetPrivateKey(const std::string &p, const std::string &q, const std::string &d);
-    bool rsaEncrypt(unsigned char *msg, int size);
-    bool rsaDecrypt(unsigned char *msg, int size);
+    void rsaSetPrivateKey(const std::string& p, const std::string& q, const std::string& d);
+    bool rsaEncrypt(unsigned char* msg, int size);
+    bool rsaDecrypt(unsigned char* msg, int size);
     int rsaGetSize();
 
 private:
     std::string _encrypt(const std::string& decrypted_string, bool useMachineUUID);
     std::string _decrypt(const std::string& encrypted_string, bool useMachineUUID);
     std::string getCryptKey(bool useMachineUUID);
-    boost::uuids::uuid m_machineUUID;
+
+    // [Fix] Changed from boost::uuids::uuid to std::string (stores raw bytes)
+    std::string m_machineUUID;
+
 #ifdef USE_GMP
     mpz_t m_p, m_q, m_n, m_e, m_d;
 #else
-    RSA *m_rsa;
+    RSA* m_rsa;
 #endif
 };
 

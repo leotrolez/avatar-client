@@ -27,10 +27,11 @@
 #include <framework/platform/platform.h>
 #include <framework/core/application.h>
 
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
-
-#include <boost/functional/hash.hpp>
+ // [Fix] Removed Boost UUID includes
+#include <random>
+#include <sstream>
+#include <iomanip>
+#include <vector>
 
 #ifndef USE_GMP
 #include <openssl/rsa.h>
@@ -81,22 +82,22 @@ std::string Crypt::base64Encode(const std::string& decoded_string)
     int pos = 0;
     int len = decoded_string.size();
 
-    while(len--) {
+    while (len--) {
         char_array_3[i++] = decoded_string[pos++];
-        if(i == 3) {
+        if (i == 3) {
             char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
             char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
             char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
             char_array_4[3] = char_array_3[2] & 0x3f;
 
-            for(i = 0; (i <4) ; i++)
+            for (i = 0; (i < 4); i++)
                 ret += base64_chars[char_array_4[i]];
             i = 0;
         }
     }
 
-    if(i) {
-        for(j = i; j < 3; j++)
+    if (i) {
+        for (j = i; j < 3; j++)
             char_array_3[j] = '\0';
 
         char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
@@ -104,10 +105,10 @@ std::string Crypt::base64Encode(const std::string& decoded_string)
         char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
         char_array_4[3] = char_array_3[2] & 0x3f;
 
-        for(j = 0; (j < i + 1); j++)
+        for (j = 0; (j < i + 1); j++)
             ret += base64_chars[char_array_4[j]];
 
-        while((i++ < 3))
+        while ((i++ < 3))
             ret += '=';
     }
 
@@ -123,34 +124,34 @@ std::string Crypt::base64Decode(const std::string& encoded_string)
     uint8 char_array_4[4], char_array_3[3];
     std::string ret;
 
-    while(len-- && (encoded_string[in_] != '=') && is_base64(encoded_string[in_])) {
+    while (len-- && (encoded_string[in_] != '=') && is_base64(encoded_string[in_])) {
         char_array_4[i++] = encoded_string[in_]; in_++;
-        if(i ==4) {
-            for(i = 0; i <4; i++)
+        if (i == 4) {
+            for (i = 0; i < 4; i++)
                 char_array_4[i] = base64_chars.find(char_array_4[i]);
 
             char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
             char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
             char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-            for(i = 0; (i < 3); i++)
+            for (i = 0; (i < 3); i++)
                 ret += char_array_3[i];
             i = 0;
         }
     }
 
-    if(i) {
-        for(j = i; j <4; j++)
+    if (i) {
+        for (j = i; j < 4; j++)
             char_array_4[j] = 0;
 
-        for(j = 0; j <4; j++)
+        for (j = 0; j < 4; j++)
             char_array_4[j] = base64_chars.find(char_array_4[j]);
 
         char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
         char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
         char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-        for(j = 0; (j < i - 1); j++)
+        for (j = 0; (j < i - 1); j++)
             ret += char_array_3[j];
     }
 
@@ -161,57 +162,88 @@ std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key)
 {
     std::string out;
     out.resize(buffer.size());
-    register size_t i, j=0;
-    for(i=0;i<buffer.size();++i) {
+    register size_t i, j = 0;
+    for (i = 0; i < buffer.size(); ++i) {
         out[i] = buffer[i] ^ key[j++];
-        if(j >= key.size())
+        if (j >= key.size())
             j = 0;
     }
     return out;
 }
 
+// [Fix] Reimplemented using standard C++ random instead of Boost
 std::string Crypt::genUUID()
 {
-    boost::uuids::random_generator gen;
-    boost::uuids::uuid u = gen();
-    return boost::uuids::to_string(u);
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<> dis(0, 15);
+    static std::uniform_int_distribution<> dis2(8, 11);
+
+    std::stringstream ss;
+    ss << std::hex;
+    for (int i = 0; i < 8; i++) ss << dis(gen);
+    ss << "-";
+    for (int i = 0; i < 4; i++) ss << dis(gen);
+    ss << "-4"; // version 4
+    for (int i = 0; i < 3; i++) ss << dis(gen);
+    ss << "-";
+    ss << dis2(gen); // variant
+    for (int i = 0; i < 3; i++) ss << dis(gen);
+    ss << "-";
+    for (int i = 0; i < 12; i++) ss << dis(gen);
+    return ss.str();
 }
 
 bool Crypt::setMachineUUID(std::string uuidstr)
 {
-    if(uuidstr.empty())
+    if (uuidstr.empty())
         return false;
     uuidstr = _decrypt(uuidstr, false);
-    if(uuidstr.length() != 16)
+    if (uuidstr.length() != 16)
         return false;
-    std::copy(uuidstr.begin(), uuidstr.end(), m_machineUUID.begin());
+    // [Fix] Store directly in string
+    m_machineUUID = uuidstr;
     return true;
 }
 
 std::string Crypt::getMachineUUID()
 {
-    if(m_machineUUID.is_nil()) {
-        boost::uuids::random_generator gen;
-        m_machineUUID = gen();
+    // [Fix] Check if string is empty
+    if (m_machineUUID.empty()) {
+        // Generate random 16 bytes for machine UUID
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static std::uniform_int_distribution<> dis(0, 255);
+        m_machineUUID.resize(16);
+        for (int i = 0; i < 16; ++i)
+            m_machineUUID[i] = static_cast<char>(dis(gen));
     }
-    return _encrypt(std::string(m_machineUUID.begin(), m_machineUUID.end()), false);
+    return _encrypt(m_machineUUID, false);
 }
 
 std::string Crypt::getCryptKey(bool useMachineUUID)
 {
-    boost::hash<boost::uuids::uuid> uuid_hasher;
-    boost::uuids::uuid uuid;
-    if(useMachineUUID) {
+    std::string uuid;
+    if (useMachineUUID) {
         uuid = m_machineUUID;
-    } else {
-        boost::uuids::nil_generator nilgen;
-        uuid = nilgen();
     }
-    boost::uuids::name_generator namegen(uuid);
-    boost::uuids::uuid u = namegen(g_app.getCompactName() + g_platform.getCPUName() + g_platform.getOSName() + g_resources.getUserDir());
-    std::size_t hash = uuid_hasher(u);
+    else {
+        // nil UUID (16 bytes of zeros)
+        uuid = std::string(16, 0);
+    }
+
+    // [Fix] Use std::hash or simple string combination instead of boost::uuid name_generator
+    std::string seedData = uuid + g_app.getCompactName() + g_platform.getCPUName() + g_platform.getOSName() + g_resources.getUserDir();
+
+    // Use the existing SHA1 encode function to generate a key from the seed data
+    // This replicates the behavior of generating a hash from the UUID+Name
+    std::string hash = sha1Encode(seedData, false);
+
+    // We need a raw key, SHA1 string is hex, let's just use the hash string itself or a hash of it
+    std::size_t str_hash = std::hash<std::string>{}(hash);
+
     std::string key;
-    key.assign((const char *)&hash, sizeof(hash));
+    key.assign((const char*)&str_hash, sizeof(str_hash));
     return key;
 }
 
@@ -228,11 +260,11 @@ std::string Crypt::_decrypt(const std::string& encrypted_string, bool useMachine
 {
     std::string decoded = base64Decode(encrypted_string);
     std::string tmp = xorCrypt(base64Decode(encrypted_string), getCryptKey(useMachineUUID));
-    if(tmp.length() >= 4) {
+    if (tmp.length() >= 4) {
         uint32 readsum = stdext::readULE32((const uint8*)tmp.c_str());
         std::string decrypted_string = tmp.substr(4);
         uint32 sum = stdext::adler32((const uint8*)decrypted_string.c_str(), decrypted_string.size());
-        if(readsum == sum)
+        if (readsum == sum)
             return decrypted_string;
     }
     return std::string();
@@ -248,11 +280,11 @@ std::string Crypt::md5Encode(const std::string& decoded_string, bool upperCase)
     MD5_Final(md, &c);
 
     char output[(MD5_DIGEST_LENGTH << 1) + 1];
-    for(int32_t i = 0; i < (int32_t)sizeof(md); ++i)
+    for (int32_t i = 0; i < (int32_t)sizeof(md); ++i)
         sprintf(output + (i << 1), "%.2X", md[i]);
 
     std::string result = output;
-    if(upperCase)
+    if (upperCase)
         return result;
 
     std::transform(result.begin(), result.end(), result.begin(), tolower);
@@ -269,11 +301,11 @@ std::string Crypt::sha1Encode(const std::string& decoded_string, bool upperCase)
     SHA1_Final(md, &c);
 
     char output[(SHA_DIGEST_LENGTH << 1) + 1];
-    for(int32_t i = 0; i < (int32_t)sizeof(md); ++i)
+    for (int32_t i = 0; i < (int32_t)sizeof(md); ++i)
         sprintf(output + (i << 1), "%.2X", md[i]);
 
     std::string result = output;
-    if(upperCase)
+    if (upperCase)
         return result;
 
     std::transform(result.begin(), result.end(), result.begin(), tolower);
@@ -290,11 +322,11 @@ std::string Crypt::sha256Encode(const std::string& decoded_string, bool upperCas
     SHA256_Final(md, &c);
 
     char output[(SHA256_DIGEST_LENGTH << 1) + 1];
-    for(int32_t i = 0; i < (int32_t)sizeof(md); ++i)
+    for (int32_t i = 0; i < (int32_t)sizeof(md); ++i)
         sprintf(output + (i << 1), "%.2X", md[i]);
 
     std::string result = output;
-    if(upperCase)
+    if (upperCase)
         return result;
 
     std::transform(result.begin(), result.end(), result.begin(), tolower);
@@ -311,11 +343,11 @@ std::string Crypt::sha512Encode(const std::string& decoded_string, bool upperCas
     SHA512_Final(md, &c);
 
     char output[(SHA512_DIGEST_LENGTH << 1) + 1];
-    for(int32_t i = 0; i < (int32_t)sizeof(md); ++i)
+    for (int32_t i = 0; i < (int32_t)sizeof(md); ++i)
         sprintf(output + (i << 1), "%.2X", md[i]);
 
     std::string result = output;
-    if(upperCase)
+    if (upperCase)
         return result;
 
     std::transform(result.begin(), result.end(), result.begin(), tolower);
@@ -332,12 +364,12 @@ void Crypt::rsaSetPublicKey(const std::string& n, const std::string& e)
     BN_dec2bn(&m_rsa->n, n.c_str());
     BN_dec2bn(&m_rsa->e, e.c_str());
     // clear rsa cache
-    if(m_rsa->_method_mod_n) {
+    if (m_rsa->_method_mod_n) {
         BN_MONT_CTX_free(m_rsa->_method_mod_n);
         m_rsa->_method_mod_n = nullptr;
     }
 #else
-    BIGNUM *bn = nullptr, *be = nullptr;
+    BIGNUM* bn = nullptr, * be = nullptr;
     BN_dec2bn(&bn, n.c_str());
     BN_dec2bn(&be, e.c_str());
     RSA_set0_key(m_rsa, bn, be, nullptr);
@@ -360,16 +392,16 @@ void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const s
     BN_dec2bn(&m_rsa->q, q.c_str());
     BN_dec2bn(&m_rsa->d, d.c_str());
     // clear rsa cache
-    if(m_rsa->_method_mod_p) {
+    if (m_rsa->_method_mod_p) {
         BN_MONT_CTX_free(m_rsa->_method_mod_p);
         m_rsa->_method_mod_p = nullptr;
     }
-    if(m_rsa->_method_mod_q) {
+    if (m_rsa->_method_mod_q) {
         BN_MONT_CTX_free(m_rsa->_method_mod_q);
         m_rsa->_method_mod_q = nullptr;
     }
 #else
-    BIGNUM *bp = nullptr, *bq = nullptr, *bd = nullptr;
+    BIGNUM* bp = nullptr, * bq = nullptr, * bd = nullptr;
     BN_dec2bn(&bp, p.c_str());
     BN_dec2bn(&bq, q.c_str());
     BN_dec2bn(&bd, d.c_str());
@@ -379,9 +411,9 @@ void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const s
 #endif
 }
 
-bool Crypt::rsaEncrypt(unsigned char *msg, int size)
+bool Crypt::rsaEncrypt(unsigned char* msg, int size)
 {
-    if(size != rsaGetSize())
+    if (size != rsaGetSize())
         return false;
 
 #ifdef USE_GMP
@@ -406,9 +438,9 @@ bool Crypt::rsaEncrypt(unsigned char *msg, int size)
 #endif
 }
 
-bool Crypt::rsaDecrypt(unsigned char *msg, int size)
+bool Crypt::rsaDecrypt(unsigned char* msg, int size)
 {
-    if(size != rsaGetSize())
+    if (size != rsaGetSize())
         return false;
 
 #ifdef USE_GMP

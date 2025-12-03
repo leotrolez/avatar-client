@@ -23,9 +23,10 @@
 #ifndef THREAD_H
 #define THREAD_H
 
-#include <boost/thread/future.hpp>
+ // [Fix] Removido include do boost::future que causava erro
+ // #include <boost/thread/future.hpp>
 
-// hack to enable std::thread on mingw32 4.6
+ // hack to enable std::thread on mingw32 4.6
 #if !defined(_GLIBCXX_HAS_GTHREADS) && defined(__GNUG__) && !defined(__clang__)
 
 #include <boost/thread/thread.hpp>
@@ -45,11 +46,12 @@ namespace std {
 
 #else
 
+// [Fix] Caminho nativo C++17 para VS2019/2022
 #include <thread>
 #include <condition_variable>
 #include <mutex>
+#include <future> // [Fix] Necessário para uso de promessas e futures no código
 
 #endif
 
 #endif
-

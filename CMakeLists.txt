@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.10) # Atualizado para suportar C++17 features
 project(otclient)
 
 set(VERSION "0.6.6")
@@ -10,11 +10,13 @@ option(FRAMEWORK_XML "Use XML " ON)
 option(FRAMEWORK_NET "Use NET " ON)
 option(FRAMEWORK_SQL "Use SQL" OFF)
 
-include(src/framework/CMakeLists.txt)
-include(src/client/CMakeLists.txt)
+# Configuração correta do C++17 para Boost 1.78+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # functions map for reading backtraces
-if(NOT APPLE)
+if(NOT APPLE AND NOT MSVC)
     set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Wl,-Map=${PROJECT_NAME}.map")
 endif()
 
@@ -35,6 +37,10 @@ if(WIN32)
 endif()
 
 add_definitions(-D"VERSION=\\"${VERSION}\\"")
+
+# Include framework and client configurations
+include(src/framework/CMakeLists.txt)
+include(src/client/CMakeLists.txt)
 
 # we want framework to be a library for faster compilation/linking
 if(USE_STATIC_LIBS)
@@ -62,9 +68,9 @@ endif()
 # installation
 set(DATA_INSTALL_DIR share/${PROJECT_NAME})
 install(TARGETS ${PROJECT_NAME} ${LIB_NAME}
-		RUNTIME DESTINATION bin
-		LIBRARY DESTINATION lib
-		ARCHIVE DESTINATION lib)
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
 install(FILES README.md BUGS LICENSE AUTHORS init.lua ${PROJECT_NAME}rc.lua DESTINATION ${DATA_INSTALL_DIR})
 install(DIRECTORY data modules DESTINATION ${DATA_INSTALL_DIR} PATTERN ".git" EXCLUDE)
 

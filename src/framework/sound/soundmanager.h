@@ -25,8 +25,9 @@
 
 #include "declarations.h"
 #include "soundchannel.h"
+#include <future> // [Fix] Necessário para std::shared_future
 
-//@bindsingleton g_sounds
+ //@bindsingleton g_sounds
 class SoundManager
 {
     enum {
@@ -39,7 +40,7 @@ public:
     void poll();
 
     void setAudioEnabled(bool enable);
-    bool isAudioEnabled() { return m_device && m_context && m_audioEnabled ; }
+    bool isAudioEnabled() { return m_device && m_context && m_audioEnabled; }
     void enableAudio() { setAudioEnabled(true); }
     void disableAudio() { setAudioEnabled(true); }
     void stopAll();
@@ -54,10 +55,12 @@ public:
 private:
     SoundSourcePtr createSoundSource(const std::string& filename);
 
-    ALCdevice *m_device;
-    ALCcontext *m_context;
+    ALCdevice* m_device;
+    ALCcontext* m_context;
 
-    std::map<StreamSoundSourcePtr, boost::shared_future<SoundFilePtr>> m_streamFiles;
+    // [Fix] boost::shared_future substituído por std::shared_future
+    std::map<StreamSoundSourcePtr, std::shared_future<SoundFilePtr>> m_streamFiles;
+
     std::unordered_map<std::string, SoundBufferPtr> m_buffers;
     std::vector<SoundSourcePtr> m_sources;
     stdext::boolean<true> m_audioEnabled;

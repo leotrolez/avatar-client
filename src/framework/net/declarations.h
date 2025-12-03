@@ -26,6 +26,7 @@
 #include <framework/global.h>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
+#include <framework/stdext/shared_object.h> // [Fix] Adicione esta linha se o erro persistir
 
 namespace asio = boost::asio;
 

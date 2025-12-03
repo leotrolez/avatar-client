@@ -5,10 +5,10 @@
 # FRAMEWORK_XML
 # FRAMEWORK_SQL
 
-# CMAKE_CURRENT_LIST_DIR cmake 2.6 compatibility
+# CMAKE_CURRENT_LIST_DIR cmake compatibility
 if(${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 6)
     get_filename_component(CMAKE_CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-endif(${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 6)
+endif()
 
 # add framework cmake modules
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
@@ -134,8 +134,10 @@ set(framework_SOURCES ${framework_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/platform/platform.h
 )
 
-set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/luafunctions.cpp
-                            PROPERTIES LANGUAGE CXX COMPILE_FLAGS "-g0 -Os")
+if(NOT MSVC)
+    set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/luafunctions.cpp
+            PROPERTIES LANGUAGE CXX COMPILE_FLAGS "-g0 -Os")
+endif()
 
 # some build options
 option(LUAJIT "Use lua jit" OFF)
@@ -157,22 +159,26 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-if(WIN32)
-    set(CPP2011_FLAGS "-std=gnu++0x")
+# Configuração de flags específicas para compiladores
+if(MSVC)
+    # Flags para Visual Studio
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_definitions(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+    # Habilitar multiprocessamento na compilação
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 else()
-    set(CPP2011_FLAGS "-std=c++0x")
+    # gcc compile flags
+    set(WARNS_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-result")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNS_FLAGS} ${ARCH_FLAGS} -pipe")
+    
+    set(CMAKE_CXX_FLAGS_COMPILESPEED      "-O0")
+    set(CMAKE_CXX_FLAGS_DEBUG             "-O0 -g")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO    "-O1 -g -fno-omit-frame-pointer")
+    set(CMAKE_CXX_FLAGS_RELEASE           "-Os")
+    set(CMAKE_CXX_FLAGS_PERFORMANCE       "-Ofast -mmmx -msse -msse2")
 endif()
 
-# gcc compile flags
-set(WARNS_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-result")
-set(CMAKE_CXX_FLAGS                   "${CMAKE_CXX_FLAGS} ${WARNS_FLAGS} ${ARCH_FLAGS} ${CPP2011_FLAGS} -pipe")
-set(CMAKE_CXX_FLAGS_COMPILESPEED      "-O0")
-set(CMAKE_CXX_FLAGS_DEBUG             "-O0 -g")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO    "-O1 -g -fno-omit-frame-pointer")
-set(CMAKE_CXX_FLAGS_RELEASE           "-Os")
-set(CMAKE_CXX_FLAGS_PERFORMANCE       "-Ofast -mmmx -msse -msse2")
-
-if(USE_LTO)
+if(USE_LTO AND NOT MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fwhole-program -flto")
     if(WIN32)
         set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Wl,-O1,--gc-sections,--sort-common,--relax")
@@ -183,7 +189,7 @@ endif()
 
 # process options
 if(USE_STATIC_LIBS)
-    if(NOT APPLE)
+    if(NOT APPLE AND NOT MSVC)
         set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -static-libgcc -static-libstdc++")
     endif()
     message(STATUS "Link to static libraries: ON")
@@ -202,11 +208,13 @@ add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 set(REQUIRED_BOOST_COMPONENTS system thread filesystem chrono)
 if(WIN32)
     set(Boost_THREADAPI win32)
-    set(framework_DEFINITIONS ${framework_DEFINITIONS} -DBOOST_THREAD_USE_LIB) # fix boost thread linkage
+    if(NOT MSVC)
+        set(framework_DEFINITIONS ${framework_DEFINITIONS} -DBOOST_THREAD_USE_LIB) 
+    endif()
 endif()
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS ${USE_STATIC_LIBS})
-find_package(Boost 1.48.0 COMPONENTS ${REQUIRED_BOOST_COMPONENTS} REQUIRED)
+find_package(Boost 1.70.0 COMPONENTS ${REQUIRED_BOOST_COMPONENTS} REQUIRED)
 
 #find lua
 if(LUAJIT)
@@ -249,7 +257,7 @@ else()
     if(NOT CMAKE_BUILD_TYPE STREQUAL "CompileSpeed")
         set(framework_DEFINITIONS ${framework_DEFINITIONS} -DNDEBUG) # NDEBUG disable asserts
     endif()
-    if(NOT APPLE)
+    if(NOT APPLE AND NOT MSVC)
         set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Wl,-s") # strip all debug information
         set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Wl,--as-needed") # only link needed libraries
     endif()
@@ -270,9 +278,10 @@ if(USE_LIBCPP)
 endif()
 
 if(WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mthreads")
-    set(framework_DEFINITIONS ${framework_DEFINITIONS} -D_WIN32_WINNT=0x0501)
-    #set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Wl,--large-address-aware") # strip all debug information
+    if(NOT MSVC)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mthreads")
+    endif()
+    set(framework_DEFINITIONS ${framework_DEFINITIONS} -D_WIN32_WINNT=0x0601) # Windows 7+
     set(SYSTEM_LIBRARIES "")
 else()
     if(APPLE)
@@ -280,7 +289,7 @@ else()
         set(SYSTEM_LIBRARIES "")
     else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-        set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -rdynamic -Wl,-rpath,./libs") # rdynamic is needed by backtrace.h used in crash handler
+        set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -rdynamic -Wl,-rpath,./libs")
         set(SYSTEM_LIBRARIES dl rt)
     endif()
 endif()
@@ -305,8 +314,6 @@ if(FRAMEWORK_GRAPHICS)
         set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS} ${EGL_INCLUDE_DIR} ${OPENGLES1_INCLUDE_DIR})
         set(framework_LIBRARIES ${framework_LIBRARIES} ${EGL_LIBRARY} ${OPENGLES1_LIBRARY})
     else()
-        ## TODO: CMake Documentation says that this is not the right
-        # Thing for Mac OS X, but it works for now.
         if(APPLE)
             include_directories(/usr/X11R6/include/)
             link_directories(/usr/X11R6/lib/)
@@ -324,11 +331,12 @@ if(FRAMEWORK_GRAPHICS)
         if(WINDOWS_CONSOLE)
             message(STATUS "Windows console: ON")
         else()
-            set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -mwindows")
+            if(NOT MSVC)
+                set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -mwindows")
+            endif()
             message(STATUS "Windows console: OFF")
         endif()
 
-        # native dx9 support while its under development
         option(DIRECTX "Use DX9 support" OFF)
         if(DIRECTX)
             find_package(DirectX REQUIRED)
@@ -496,7 +504,8 @@ endif()
 
 if(FRAMEWORK_NET)
     if(WIN32)
-        set(NET_LIBRARIES ws2_32 mswsock)
+        # Importante: bcrypt adicionado para suporte ao Boost 1.78+ UUID
+        set(NET_LIBRARIES ws2_32 mswsock bcrypt)
     else()
         set(NET_LIBRARIES "")
     endif()
@@ -554,4 +563,3 @@ endif()
 
 include_directories(${framework_INCLUDE_DIRS})
 add_definitions(${framework_DEFINITIONS})
-

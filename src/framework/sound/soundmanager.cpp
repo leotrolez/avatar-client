@@ -32,24 +32,25 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/core/asyncdispatcher.h>
 #include <thread>
+#include <chrono> // [Fix] Required for std::chrono
 
 SoundManager g_sounds;
 
 void SoundManager::init()
 {
     m_device = alcOpenDevice(NULL);
-    if(!m_device) {
+    if (!m_device) {
         g_logger.error("unable to open audio device");
         return;
     }
 
     m_context = alcCreateContext(m_device, NULL);
-    if(!m_context) {
+    if (!m_context) {
         g_logger.error(stdext::format("unable to create audio context: %s", alcGetString(m_device, alcGetError(m_device))));
         return;
     }
 
-    if(alcMakeContextCurrent(m_context) != ALC_TRUE) {
+    if (alcMakeContextCurrent(m_context) != ALC_TRUE) {
         g_logger.error(stdext::format("unable to make context current: %s", alcGetString(m_device, alcGetError(m_device))));
         return;
     }
@@ -59,7 +60,7 @@ void SoundManager::terminate()
 {
     ensureContext();
 
-    for(auto it = m_streamFiles.begin(); it != m_streamFiles.end();++it) {
+    for (auto it = m_streamFiles.begin(); it != m_streamFiles.end(); ++it) {
         auto& future = it->second;
         future.wait();
     }
@@ -73,12 +74,12 @@ void SoundManager::terminate()
 
     alcMakeContextCurrent(nullptr);
 
-    if(m_context) {
+    if (m_context) {
         alcDestroyContext(m_context);
         m_context = nullptr;
     }
 
-    if(m_device) {
+    if (m_device) {
         alcCloseDevice(m_device);
         m_device = nullptr;
     }
@@ -89,58 +90,60 @@ void SoundManager::poll()
     static ticks_t lastUpdate = 0;
     ticks_t now = g_clock.millis();
 
-    if(now - lastUpdate < POLL_DELAY)
+    if (now - lastUpdate < POLL_DELAY)
         return;
 
     lastUpdate = now;
 
     ensureContext();
 
-    for(auto it = m_streamFiles.begin(); it != m_streamFiles.end();) {
+    for (auto it = m_streamFiles.begin(); it != m_streamFiles.end();) {
         StreamSoundSourcePtr source = it->first;
         auto& future = it->second;
 
-        if(future.is_ready()) {
+        // [Fix] Standard C++ way to check if future is ready
+        if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
             SoundFilePtr sound = future.get();
-            if(sound)
+            if (sound)
                 source->setSoundFile(sound);
             else
                 source->stop();
             it = m_streamFiles.erase(it);
-        } else {
+        }
+        else {
             ++it;
         }
     }
 
-    for(auto it = m_sources.begin(); it != m_sources.end();) {
+    for (auto it = m_sources.begin(); it != m_sources.end();) {
         SoundSourcePtr source = *it;
 
         source->update();
 
-        if(!source->isPlaying())
+        if (!source->isPlaying())
             it = m_sources.erase(it);
         else
             ++it;
     }
 
-    for(auto it : m_channels) {
+    for (auto it : m_channels) {
         it.second->update();
     }
 
-    if(m_context) {
+    if (m_context) {
         alcProcessContext(m_context);
     }
 }
 
 void SoundManager::setAudioEnabled(bool enable)
 {
-    if(m_audioEnabled == enable)
+    if (m_audioEnabled == enable)
         return;
 
     m_audioEnabled = enable;
-    if(!enable) {
+    if (!enable) {
         ensureContext();
-        for(const SoundSourcePtr& source : m_sources) {
+        for (const SoundSourcePtr& source : m_sources) {
             source->stop();
         }
     }
@@ -151,34 +154,34 @@ void SoundManager::preload(std::string filename)
     filename = resolveSoundFile(filename);
 
     auto it = m_buffers.find(filename);
-    if(it != m_buffers.end())
+    if (it != m_buffers.end())
         return;
 
     ensureContext();
     SoundFilePtr soundFile = SoundFile::loadSoundFile(filename);
 
     // only keep small files
-    if(!soundFile || soundFile->getSize() > MAX_CACHE_SIZE)
+    if (!soundFile || soundFile->getSize() > MAX_CACHE_SIZE)
         return;
 
     SoundBufferPtr buffer = SoundBufferPtr(new SoundBuffer);
-    if(buffer->fillBuffer(soundFile))
+    if (buffer->fillBuffer(soundFile))
         m_buffers[filename] = buffer;
 }
 
 SoundSourcePtr SoundManager::play(std::string filename, float fadetime, float gain)
 {
-    if(!m_audioEnabled)
+    if (!m_audioEnabled)
         return nullptr;
 
     ensureContext();
 
-    if(gain == 0)
+    if (gain == 0)
         gain = 1.0f;
 
     filename = resolveSoundFile(filename);
     SoundSourcePtr soundSource = createSoundSource(filename);
-    if(!soundSource) {
+    if (!soundSource) {
         g_logger.error(stdext::format("unable to play '%s'", filename));
         return nullptr;
     }
@@ -187,7 +190,7 @@ SoundSourcePtr SoundManager::play(std::string filename, float fadetime, float ga
     soundSource->setRelative(true);
     soundSource->setGain(gain);
 
-    if(fadetime > 0)
+    if (fadetime > 0)
         soundSource->setFading(StreamSoundSource::FadingOn, fadetime);
 
     soundSource->play();
@@ -200,7 +203,7 @@ SoundSourcePtr SoundManager::play(std::string filename, float fadetime, float ga
 SoundChannelPtr SoundManager::getChannel(int channel)
 {
     ensureContext();
-    if(!m_channels[channel])
+    if (!m_channels[channel])
         m_channels[channel] = SoundChannelPtr(new SoundChannel(channel));
     return m_channels[channel];
 }
@@ -208,11 +211,11 @@ SoundChannelPtr SoundManager::getChannel(int channel)
 void SoundManager::stopAll()
 {
     ensureContext();
-    for(const SoundSourcePtr& source : m_sources) {
+    for (const SoundSourcePtr& source : m_sources) {
         source->stop();
     }
 
-    for(auto it : m_channels) {
+    for (auto it : m_channels) {
         it.second->stop();
     }
 }
@@ -223,10 +226,11 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
 
     try {
         auto it = m_buffers.find(filename);
-        if(it != m_buffers.end()) {
+        if (it != m_buffers.end()) {
             source = SoundSourcePtr(new SoundSource);
             source->setBuffer(it->second);
-        } else {
+        }
+        else {
 #if defined __linux && !defined OPENGL_ES
             // due to OpenAL implementation bug, stereo buffers are always downmixed to mono on linux systems
             // this is hack to work around the issue
@@ -243,25 +247,27 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
                 stdext::timer a;
                 try {
                     return SoundFile::loadSoundFile(filename);
-                } catch(std::exception& e) {
+                }
+                catch (std::exception& e) {
                     g_logger.error(e.what());
                     return nullptr;
                 }
-            });
+                });
 
             streamSource = StreamSoundSourcePtr(new StreamSoundSource);
             streamSource->downMix(StreamSoundSource::DownMixRight);
             streamSource->setRelative(true);
-            streamSource->setPosition(Point(128,0));
+            streamSource->setPosition(Point(128, 0));
             combinedSource->addSource(streamSource);
             m_streamFiles[streamSource] = g_asyncDispatcher.schedule([=]() -> SoundFilePtr {
                 try {
                     return SoundFile::loadSoundFile(filename);
-                } catch(std::exception& e) {
+                }
+                catch (std::exception& e) {
                     g_logger.error(e.what());
                     return nullptr;
                 }
-            });
+                });
 
             source = combinedSource;
 #else
@@ -269,15 +275,17 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
             m_streamFiles[streamSource] = g_asyncDispatcher.schedule([=]() -> SoundFilePtr {
                 try {
                     return SoundFile::loadSoundFile(filename);
-                } catch(std::exception& e) {
+                }
+                catch (std::exception& e) {
                     g_logger.error(e.what());
                     return nullptr;
                 }
-            });
+                });
             source = streamSource;
 #endif
         }
-    } catch(std::exception& e) {
+    }
+    catch (std::exception& e) {
         g_logger.error(stdext::format("failed to load sound source: '%s'", e.what()));
         return nullptr;
     }
@@ -294,6 +302,6 @@ std::string SoundManager::resolveSoundFile(std::string file)
 
 void SoundManager::ensureContext()
 {
-    if(m_context)
+    if (m_context)
         alcMakeContextCurrent(m_context);
 }
